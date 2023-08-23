@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "retake-assignment2-olap"
+version = "0.1.0"
+description = "This is a retake assignment 2"
+authors = ["Huy Ton <479984@student.saxion.nl>"]
+readme = "README.md"
+packages = [{include = "retake_assignment2_olap"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^2.0.3"
+duckdb = "^0.8.1"
+dbt-duckdb = "^1.5.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
