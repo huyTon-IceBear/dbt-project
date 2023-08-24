@@ -33,17 +33,12 @@ def load_data_from_text(conn, file_path):
         lines = file.readlines()
 
     table_name = os.path.basename(file_path).replace(".txt", "")
-    data = []
-
-    for line in lines:
-        parts = line.strip().split('\t')
-        if len(parts) == 2:
-            timestamp, description = parts
-            data.append({"timestamp": timestamp, "event_description": description})
-        else:
-            print(f"Unexpected format in file: {file_path} for line: {line}")
+    
+   # Remove extra spaces from the beginning or end of lines then make a list.
+    data = [{'line_content': line.strip()} for line in lines]
 
     df = pd.DataFrame(data)
+
     # Use DuckDB's from_df method
     conn.from_df(df).create(table_name)
 
