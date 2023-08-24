@@ -3,4 +3,4 @@ dbt_formula1:
   outputs:
     dev:
       type: duckdb
-      path: database.duckdb   # TODO: insert your duckdb filename here!
+      path: database.duckdb  

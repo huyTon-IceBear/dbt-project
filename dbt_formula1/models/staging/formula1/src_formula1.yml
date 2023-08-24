@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: formula1
+    description: A database contain information about formula 1 races
+    schema: formula1
+    tables:
+      - name: circuits
+        description: Raw circuit data.
+        columns:
+          - name: name
+            description: Name of the circuit.
+          - name: location
+            description: Location where the circuit happen.
+          - name: country
+            description: Country where the circuit happen.
+          - name: latitude
+            description: Latitude of the circuit.
+          - name: longitude
+            description: Longitude of the circuit.
+          - name: altitude
+            description: Altitude of the circuit.
+          - name: url
+            description: url of the circuit.
+      - name: constructor_results
+      - name: driver_results
+      - name: driver_sprint_results
+      - name: lap_times
+      - name: teams
+      - name: drivers
