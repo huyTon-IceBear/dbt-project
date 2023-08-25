@@ -24,11 +24,31 @@ def load_data_from_csv(conn, file_path):
     df = preprocess_dataframe(df)
     table_name = os.path.basename(file_path).replace(".csv", "")
     
-   # Ensure the formula1 schema exists
+    # Determine the category based on the table name
+    category = determine_category(table_name)
+
+    # Ensure the formula1 schema exists
     conn.execute("CREATE SCHEMA IF NOT EXISTS formula1")
     
     # Use DuckDB's from_df method, but also specify the schema "formula1"
-    conn.from_df(df).create(f"formula1.{table_name}")
+    if category == "other":
+        conn.from_df(df).create(f"formula1.{table_name}")
+    else:
+        table_name = f"formula1.{category}"
+        # Check if the table already exists in the catalog
+        result = conn.execute(f"SELECT * from {table_name}")
+        if result.fetchone() is None:
+            # Table doesn't exist, create it
+            print("trying to create table data")
+            conn.from_df(df).create(table_name)
+        else:
+            # Table exists, append data
+            print("trying to append data")
+            # Loop through each row in the DataFrame and insert it into the table
+            for index, row in df.iterrows():
+                values = ", ".join(f"'{value}'" for value in row.values)
+                sql_query = f"INSERT INTO {table_name} VALUES ({values})"
+                conn.execute(sql_query)
 
 # Load data from a TXT file into duckdb.
 def load_data_from_text(conn, file_path):
@@ -36,9 +56,12 @@ def load_data_from_text(conn, file_path):
         lines = file.readlines()
 
     table_name = os.path.basename(file_path).replace(".txt", "")
-    
-   # Remove extra spaces from the beginning or end of lines then make a list.
-    data = [{'line_content': line.strip()} for line in lines]
+
+    # Determine the category based on the table name
+    category = determine_category(table_name)
+
+    # Remove extra spaces from the beginning or end of lines then make a list.
+    data = [{'line_content': line.strip(), 'category': category} for line in lines]
 
     df = pd.DataFrame(data)
 
@@ -46,7 +69,43 @@ def load_data_from_text(conn, file_path):
     conn.execute("CREATE SCHEMA IF NOT EXISTS formula1")
 
     # Use DuckDB's from_df method, but also specify the schema "formula1"
-    conn.from_df(df).create(f"formula1.{table_name}")
+    if category == "other":
+        conn.from_df(df).create(f"formula1.{table_name}")
+    else:
+        table_name = f"formula1.{category}"
+        # Check if the table already exists in the catalog
+        result = conn.execute(f"SELECT * from {table_name}")
+        if result.fetchone() is None:
+            # Table doesn't exist, create it
+            print("trying to create table data")
+            conn.from_df(df).create(table_name)
+        else:
+            # Table exists, append data
+            print("trying to append data")
+            # Loop through each row in the DataFrame and insert it into the table
+            for index, row in df.iterrows():
+                values = ", ".join(f"'{value}'" for value in row.values)
+                sql_query = f"INSERT INTO {table_name} VALUES ({values})"
+                conn.execute(sql_query)
+
+# Determine the category based on the table name
+def determine_category(table_name):
+    # Define naming patterns and corresponding categories
+    patterns_to_categories = {
+        "_laps": "laps",
+        "_racecontrol": "racecontrols",
+        "_weather": "weathers",
+        "_car_data": "car_datas",
+        "_car_positions": "car_positions"
+        # Add more patterns and categories as needed
+    }
+    
+    for pattern, category in patterns_to_categories.items():
+        if pattern in table_name:
+            return category
+
+    # If no pattern matches, return a default category
+    return "other"
 
 # Fetch data from given API endpoint.
 def fetch_data_from_api(api_endpoint):
@@ -59,7 +118,7 @@ def fetch_data_from_api(api_endpoint):
         return None
     
 # Load data from different sources (CSV files, TXT files, API) into duckdb.
-def load_data_into_duckdb(conn, data_directory, api_base_url):
+def load_data_into_duckdb(conn, data_directory, api_base_url):    
     data_files = os.listdir(data_directory)
     for file in data_files:
         file_path = os.path.join(data_directory, file)
