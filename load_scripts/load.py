@@ -35,9 +35,10 @@ def load_data_from_csv(conn, file_path):
         conn.from_df(df).create(f"formula1.{table_name}")
     else:
         table_name = f"formula1.{category}"
-        # Check if the table already exists in the catalog
-        result = conn.execute(f"SELECT * from {table_name}")
-        if result.fetchone() is None:
+        try:
+            # Check if the table already exists in the catalog
+            result = conn.execute(f"SELECT * FROM {table_name} LIMIT 1")
+        except duckdb.CatalogException:
             # Table doesn't exist, create it
             print("trying to create table data")
             conn.from_df(df).create(table_name)
@@ -73,9 +74,10 @@ def load_data_from_text(conn, file_path):
         conn.from_df(df).create(f"formula1.{table_name}")
     else:
         table_name = f"formula1.{category}"
-        # Check if the table already exists in the catalog
-        result = conn.execute(f"SELECT * from {table_name}")
-        if result.fetchone() is None:
+        try:
+            # Check if the table already exists in the catalog
+            result = conn.execute(f"SELECT * FROM {table_name} LIMIT 1")
+        except duckdb.CatalogException:
             # Table doesn't exist, create it
             print("trying to create table data")
             conn.from_df(df).create(table_name)
@@ -87,6 +89,7 @@ def load_data_from_text(conn, file_path):
                 values = ", ".join(f"'{value}'" for value in row.values)
                 sql_query = f"INSERT INTO {table_name} VALUES ({values})"
                 conn.execute(sql_query)
+
 
 # Determine the category based on the table name
 def determine_category(table_name):
