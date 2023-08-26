@@ -7,4 +7,4 @@ select
     Break as brake, 
     Time as lap_time,
     DriverNumber as driver_number
-from {{ source('formula1', 'laps') }}
+from {{ source('formula1', 'car_datas') }}

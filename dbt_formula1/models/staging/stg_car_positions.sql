@@ -5,4 +5,4 @@ select
     PitOutTime as y_position,
     PitInTime as z_position,
     Sector1Time as driver_number
-from {{ source('formula1', 'laps') }}
+from {{ source('formula1', 'car_positions') }}

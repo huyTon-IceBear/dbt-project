@@ -1,4 +1,4 @@
 select
     line_content as control_time,
     category as control_event
-from {{ source('formula1', 'laps') }}
+from {{ source('formula1', 'racecontrols') }}

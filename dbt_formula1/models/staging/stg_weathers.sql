@@ -7,4 +7,4 @@ select
     TrackTemp as track_temperature, 
     WindDirection as wind_direction,
     WindSpeed as wind_speed
-from {{ source('formula1', 'laps') }}
+from {{ source('formula1', 'weathers') }}
