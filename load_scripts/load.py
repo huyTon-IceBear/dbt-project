@@ -3,25 +3,10 @@ import pandas as pd
 import requests
 import duckdb
 
-# Preprocess the data frame based on the columns present.
-def preprocess_dataframe(df):
-
-    # For columns containing "Time", remove the unnecessary "0 days" part.
-    for column in df.columns:
-        if "Time" in column:
-            df[column] = df[column].str.replace("0 days ", "")
-
-    # For columns containing "LapTime", replace empty by 0 value.
-    if 'LapTime' in df.columns:
-        df['LapTime'] = df['LapTime'].apply(lambda x: '00:00:00.000000' if not x else x)
-
-    return df
-
 # Load data from a CSV file into duckdb.
 def load_data_from_csv(conn, file_path):
     df = pd.read_csv(file_path)
     # Preprocess the data frame
-    df = preprocess_dataframe(df)
     table_name = os.path.basename(file_path).replace(".csv", "")
     
     # Determine the category based on the table name
